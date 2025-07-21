@@ -8,6 +8,17 @@ export class LoginBodyDTO {
   password: string
 }
 
+export class LoginResDTO {
+  @IsString()
+  accessToken: string
+  @IsString()
+  refreshToken: string
+
+  constructor(partial: Partial<LoginResDTO>) {
+    Object.assign(this, partial)
+  }
+}
+
 export class RegisterBodyDTO extends LoginBodyDTO {
   @IsString({ message: 'Tên phải là một chuỗi' })
   name: string
