@@ -1,6 +1,13 @@
-import { Controller, Post, Body } from '@nestjs/common'
+import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common'
 import { AuthService } from 'src/routes/auth/auth.service'
-import { LoginBodyDTO, LoginResDTO, RegisterBodyDTO, RegisterResDTO } from 'src/routes/auth/auth.dto'
+import {
+  LoginBodyDTO,
+  LoginResDTO,
+  RefreshTokenBodyDTO,
+  RefreshTokenResDTO,
+  RegisterBodyDTO,
+  RegisterResDTO,
+} from 'src/routes/auth/auth.dto'
 
 @Controller('auth')
 export class AuthController {
@@ -17,5 +24,14 @@ export class AuthController {
     // Implement your login logic here
     // This is just a placeholder
     return new LoginResDTO(await this.authService.login(body))
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('refresh-token')
+  async refreshToken(@Body() body: RefreshTokenBodyDTO) {
+    // Implement your refresh token logic here
+    // This is just a placeholder
+
+    return new RefreshTokenResDTO(await this.authService.refreshToken(body.refreshToken))
   }
 }
