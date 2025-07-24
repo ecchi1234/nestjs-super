@@ -27,7 +27,7 @@ export class PostsService {
   }
 
   updatePost(id: string, body: any) {
-    return { id, ...body }
+    return `Post with ID: ${id} updated with title: ${body.title} and content: ${body.content}`
   }
 
   deletePost(id: string) {
