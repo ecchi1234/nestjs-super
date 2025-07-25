@@ -6,10 +6,6 @@ export const AuthType = {
 } as const
 
 export type AuthTypeType = (typeof AuthType)[keyof typeof AuthType]
-export type AuthTypeDecoratorPayload = {
-  authTypes: AuthTypeType[]
-  options: { condition: ConditionGuardType }
-}
 
 export const ConditionGuard = {
   And: 'And',

@@ -2,9 +2,9 @@ import { AccessTokenGuard } from 'src/shared/guards/access-token.guard'
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 
-import { AUTH_TYPE_KEY } from 'src/shared/decorators/auth.decorator'
+import { AUTH_TYPE_KEY, AuthTypeDecoratorPayload } from 'src/shared/decorators/auth.decorator'
 import { APIKeyGuard } from 'src/shared/guards/api-key.guard'
-import { AuthType, AuthTypeDecoratorPayload, ConditionGuard } from 'src/shared/constants/auth.constant'
+import { AuthType, ConditionGuard } from 'src/shared/constants/auth.constant'
 
 @Injectable()
 export class AuthenticationGuard implements CanActivate {
