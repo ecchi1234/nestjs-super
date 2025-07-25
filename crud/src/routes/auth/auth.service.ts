@@ -103,4 +103,23 @@ export class AuthService {
       throw new UnauthorizedException()
     }
   }
+
+  async logout(refreshToken: string) {
+    try {
+      // 1. Kiểm tra refresh token có hợp lệ hay không
+      await this.tokenService.verifyRefreshToken(refreshToken)
+
+      // 2. Xóa refresh token khỏi cơ sở dữ liệu
+      await this.prismaService.refreshToken.delete({
+        where: { token: refreshToken },
+      })
+
+      return { message: 'Logout successful' }
+    } catch (error) {
+      if (isNotFoundPrismaError(error)) {
+        throw new UnauthorizedException('Refresh token has been revoked')
+      }
+      throw new UnauthorizedException()
+    }
+  }
 }
