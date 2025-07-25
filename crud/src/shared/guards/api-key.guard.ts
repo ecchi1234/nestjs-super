@@ -7,7 +7,7 @@ export class APIKeyGuard implements CanActivate {
     const request = context.switchToHttp().getRequest()
     const xAPIKey = request.headers['x-api-key']
     if (xAPIKey !== envConfig.SECRET_API_KEY) {
-      throw new UnauthorizedException('API key is missing')
+      throw new UnauthorizedException()
     }
 
     return true

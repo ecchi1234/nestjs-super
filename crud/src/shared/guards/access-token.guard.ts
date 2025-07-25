@@ -9,7 +9,7 @@ export class AccessTokenGuard implements CanActivate {
     const request = context.switchToHttp().getRequest()
     const accessToken = request.headers['authorization']?.split(' ')[1]
     if (!accessToken) {
-      throw new UnauthorizedException('Access token is missing')
+      throw new UnauthorizedException()
     }
 
     try {
@@ -19,6 +19,5 @@ export class AccessTokenGuard implements CanActivate {
     } catch {
       throw new UnauthorizedException()
     }
-    // return validateRequest(request)
   }
 }

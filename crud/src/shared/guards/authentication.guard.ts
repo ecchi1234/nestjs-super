@@ -1,10 +1,10 @@
 import { AccessTokenGuard } from 'src/shared/guards/access-token.guard'
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common'
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 
 import { AUTH_TYPE_KEY } from 'src/shared/decorators/auth.decorator'
 import { APIKeyGuard } from 'src/shared/guards/api-key.guard'
-import { AuthType } from 'src/shared/constants/auth.constant'
+import { AuthType, AuthTypeDecoratorPayload, ConditionGuard } from 'src/shared/constants/auth.constant'
 
 @Injectable()
 export class AuthenticationGuard implements CanActivate {
@@ -23,12 +23,35 @@ export class AuthenticationGuard implements CanActivate {
       },
     }
   }
-  canActivate(context: ExecutionContext): boolean {
-    const authTypeValue = this.reflector.getAllAndOverride<boolean>(AUTH_TYPE_KEY, [
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const authTypeValue = this.reflector.getAllAndOverride<AuthTypeDecoratorPayload | undefined>(AUTH_TYPE_KEY, [
       context.getHandler(),
       context.getClass(),
-    ])
-    console.log('authTypeValue', authTypeValue)
-    return true
+    ]) ?? { authTypes: [AuthType.None], options: { condition: ConditionGuard.And } }
+    const guards = authTypeValue.authTypes.map((authType) => this.authTypeGuardMap[authType])
+
+    let error = new UnauthorizedException()
+
+    if (authTypeValue.options.condition === ConditionGuard.Or) {
+      for (const guard of guards) {
+        const canActivate = await Promise.resolve(guard.canActivate(context)).catch((err) => {
+          error = err
+          return false
+        })
+
+        if (canActivate) {
+          return true
+        }
+      }
+      throw error
+    } else {
+      for (const guard of guards) {
+        const canActivate = await guard.canActivate(context)
+        if (!canActivate) {
+          throw new UnauthorizedException()
+        }
+      }
+      return true
+    }
   }
 }
