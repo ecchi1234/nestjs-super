@@ -7,8 +7,18 @@ export class PostsService {
     // PrismaService is injected to interact with the database
   }
 
-  getPosts() {
-    return this.prismaService.post.findMany({})
+  getPosts(userId: number) {
+    return this.prismaService.post.findMany({
+      where: {
+        authorId: userId,
+      },
+
+      include: {
+        author: {
+          omit: { password: true }, // Exclude sensitive fields
+        },
+      },
+    })
   }
 
   createPost(body: any, userId: number) {
