@@ -1,45 +1,34 @@
 import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common'
 import { AuthService } from 'src/routes/auth/auth.service'
-import {
-  LoginBodyDTO,
-  LoginResDTO,
-  LogoutBodyDTO,
-  LogoutResDTO,
-  RefreshTokenBodyDTO,
-  RefreshTokenResDTO,
-  RegisterBodyDTO,
-  RegisterResDTO,
-} from 'src/routes/auth/auth.dto'
-
+import { RegisterBodyDto } from './auth.dto'
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   // @SerializeOptions({ type: RegisterResDTO })
   @Post('register')
-  async register(@Body() body: RegisterBodyDTO) {
-    return new RegisterResDTO(await this.authService.register(body))
+  async register(@Body() body: RegisterBodyDto) {
+    return this.authService.register(body)
   }
 
   @Post('login')
-  async login(@Body() body: LoginBodyDTO) {
+  async login(@Body() body: any) {
     // Implement your login logic here
     // This is just a placeholder
-    return new LoginResDTO(await this.authService.login(body))
+    return this.authService.login(body)
   }
 
   @Post('refresh-token')
   @HttpCode(HttpStatus.OK)
-  async refreshToken(@Body() body: RefreshTokenBodyDTO) {
-    console.log('Refreshing token with body:', body)
+  async refreshToken(@Body() body: any) {
     // Implement your refresh token logic here
     // This is just a placeholder
 
-    return new RefreshTokenResDTO(await this.authService.refreshToken(body.refreshToken))
+    return this.authService.refreshToken(body.refreshToken)
   }
 
   @Post('logout')
-  async logout(@Body() body: LogoutBodyDTO) {
-    return new LogoutResDTO(await this.authService.logout(body.refreshToken))
+  async logout(@Body() body: any) {
+    return this.authService.logout(body.refreshToken)
   }
 }

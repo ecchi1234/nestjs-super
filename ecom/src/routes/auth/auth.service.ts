@@ -1,9 +1,9 @@
 import { ConflictException, Injectable, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common'
 import { HashingService } from 'src/shared/services/hashing.service'
 import { PrismaService } from 'src/shared/services/prisma.service'
-import { LoginBodyDTO } from './auth.dto'
 import { TokenService } from 'src/shared/services/token.service'
 import { isNotFoundPrismaError, isUniqueConstraintPrismaError } from 'src/shared/helpers'
+import { RolesService } from './role.service'
 
 @Injectable()
 export class AuthService {
@@ -11,17 +11,25 @@ export class AuthService {
     private readonly hashingService: HashingService,
     private readonly prismaService: PrismaService,
     private readonly tokenService: TokenService,
+    private readonly rolesService: RolesService,
   ) {}
   async register(body: any) {
     // Implement your registration logic here
 
     try {
+      const clientRoleId = await this.rolesService.getClientRoleId()
       const hashedPassword = await this.hashingService.hash(body.password)
       const user = await this.prismaService.user.create({
         data: {
           email: body.email,
           password: hashedPassword,
           name: body.name,
+          phoneNumber: body.phoneNumber,
+          roleId: clientRoleId,
+        },
+        omit: {
+          password: true, // Exclude password from the response
+          totpSecret: true, // Exclude totpSecret from the response
         },
       })
       return user
@@ -33,7 +41,7 @@ export class AuthService {
     }
   }
 
-  async login(body: LoginBodyDTO) {
+  async login(body: any) {
     // Implement your login logic here
     // This is just a placeholder
     const user = await this.prismaService.user.findUnique({
